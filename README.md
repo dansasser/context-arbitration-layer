@@ -6,7 +6,7 @@
 
 ---
 
-CAL extends `claude-code` into a multi-process reasoning system that orchestrates subprocess executors (like `ollama-code`) while maintaining persistent context through a memory ledger.
+CAL extends `Claude Code` into a multi-process reasoning system that orchestrates subprocess executors (like `ollama-code`, `claude -p`, `claude --agent`) while maintaining persistent context through a memory ledger.
 
 **Proven Results:** 5.5× token efficiency | 92.25% context retention | 69,500 tokens saved per session
 
@@ -14,7 +14,7 @@ CAL extends `claude-code` into a multi-process reasoning system that orchestrate
 
 ## The Problem CAL Solves
 
-Large codebases and deep reasoning chains push `claude-code` beyond its context window limits. Even with compression, you face:
+Large codebases and deep reasoning chains push `Claude Code` beyond its context window limits. Even with compression, you face:
 
 | Problem             | Cause                        | Impact                          |
 | :------------------ | :--------------------------- | :------------------------------ |
@@ -32,7 +32,7 @@ Large codebases and deep reasoning chains push `claude-code` beyond its context 
 ```
 Developer Request
    ↓
-claude-code (Controller)
+Claude Code (Controller)
    ├─ Analyzes task
    ├─ Decides: Sequential? Concurrent? Staggered?
    └─ Spawns ollama-code subprocess(es)
@@ -41,7 +41,7 @@ claude-code (Controller)
        ↓
    Return structured JSON summaries
        ↓
-claude-code validates checksums
+Claude Code validates checksums
        ↓
    Commits to .cal_memory.json ledger
        ↓
@@ -52,8 +52,8 @@ Developer receives result with preserved context
 
 **Three Core Components:**
 
-1. **Controller** (`claude-code`) - Orchestrates tasks, validates outputs, manages ledger
-2. **Executors** (`ollama-code`, `gemini-cli`, `forgecode`) - Perform heavy analysis
+1. **Controller** (`Claude Code`) - Orchestrates tasks, validates outputs, manages ledger
+2. **Executors** (`ollama-code`, `claude -p`, `claude --agent`, `gemini-cli`, `forgecode`) - Perform heavy analysis
 3. **Ledger** (`.cal_memory.json`) - Persistent context store
 
 ---
@@ -136,12 +136,12 @@ With CAL:    ██████████████████████�
 
 **Without CAL (Direct Analysis):**
 ```
-claude-code reads 200 files → 85,000 tokens consumed → context overflow → summarize → semantic drift
+Claude Code reads 200 files → 85,000 tokens consumed → context overflow → summarize → semantic drift
 ```
 
 **With CAL (Delegated Analysis):**
 ```
-claude-code spawns ollama-code → ollama-code reads 200 files → returns 1,500 token summary → claude-code appends to ledger → 15,500 tokens total
+Claude Code spawns ollama-code → ollama-code reads 200 files → returns 1,500 token summary → Claude Code appends to ledger → 15,500 tokens total
 ```
 
 ### Multi-Spawn Example
@@ -150,14 +150,14 @@ claude-code spawns ollama-code → ollama-code reads 200 files → returns 1,500
 
 **CAL Orchestration:**
 ```
-Step 1: claude-code breaks task into 3 independent analyses
+Step 1: Claude Code breaks task into 3 independent analyses
   ├─ Subprocess 1: ollama-code analyzes authentication module
   ├─ Subprocess 2: ollama-code analyzes database layer
   └─ Subprocess 3: ollama-code analyzes API endpoints
 
 Step 2: All 3 run concurrently (parallel spawn)
 
-Step 3: claude-code collects 3 JSON outputs:
+Step 3: Claude Code collects 3 JSON outputs:
   {
     "task_id": "cal_001",
     "executor": "ollama-code",
@@ -178,15 +178,15 @@ Result: 500+ files analyzed with 5.5× efficiency
 
 **Session 1 (Monday):**
 ```
-claude-code delegates: "Analyze project architecture"
+Claude Code delegates: "Analyze project architecture"
 ollama-code produces: 15-page architecture document
 Ledger stores: Compressed summary (800 tokens)
 ```
 
 **Session 2 (Tuesday):**
 ```
-claude-code reads ledger: Loads Monday's architecture summary
-claude-code delegates: "Find performance bottlenecks in architecture"
+Claude Code reads ledger: Loads Monday's architecture summary
+Claude Code delegates: "Find performance bottlenecks in architecture"
 ollama-code uses: Previous context from ledger
 Result: No re-analysis needed, work continues seamlessly
 ```
@@ -217,12 +217,12 @@ Result: No re-analysis needed, work continues seamlessly
 
 ## System Comparison
 
-| Feature                | `claude-code` Alone      | Claude Sub-Agents        | **CAL (Multi-Executor)**      |
+| Feature                | `Claude Code` Alone      | Claude Sub-Agents        | **CAL (Multi-Executor)**      |
 | :--------------------- | :----------------------- | :----------------------- | :---------------------------- |
-| Delegated Execution    | ⚠️ Limited internal tools | ✅ Internal only          | ✅ External CLI & HTTP         |
+| Delegated Execution    | ⚠️ Limited internal tools | ✅ Internal only          | ✅ `claude -p`, `--agent`, External CLI & HTTP |
 | Token Efficiency       | ⚠️ Low                    | ⚠️ Moderate               | ✅ 35-45% savings              |
 | Persistent State       | ❌ Ephemeral              | ❌ Session-based          | ✅ `.cal_memory.json` ledger   |
-| Cross-Model Support    | ❌                        | ❌                        | ✅ Any CLI/MCP executor        |
+| Cross-Model Support    | ❌                        | ❌                        | ✅ Claude + Ollama + any CLI/MCP |
 | File-System Access     | ❌ Sandboxed              | ⚠️ Partial                | ✅ Full read access            |
 | Scalability            | ⚠️ Single thread          | ⚠️ Partial multi-spawn    | ✅ Concurrent spawn pool       |
 | Fault Tolerance        | ⚠️ Manual reset           | ⚠️ Limited retry          | ✅ Auto-retry + rollback       |
@@ -260,7 +260,7 @@ Result: No re-analysis needed, work continues seamlessly
 ### How It Enables Continuity
 
 1. **Task completes** → Summary validated → Committed to ledger
-2. **New session starts** → claude-code reads ledger → Context restored
+2. **New session starts** → Claude Code reads ledger → Context restored
 3. **New task delegates** → Executor can reference previous summaries
 4. **Token savings** → Compressed summaries replace full file re-reads
 
@@ -370,7 +370,7 @@ SPDX-License-Identifier: MIT OR AGPL-3.0-only
 
 **Attribution:** This tool extends the Context Arbitration Layer (CAL) architecture developed by Dan Sasser / Gorombo Labs AI Research.
 
-**Contributors:** `claude-code`, `ollama-code`, `gemini-cli`, `forgecode`
+**Contributors:** `Claude Code`, `ollama-code`, `gemini-cli`, `forgecode`
 
 ---
 
@@ -384,8 +384,8 @@ SPDX-License-Identifier: MIT OR AGPL-3.0-only
 - Ledger rotation: **250MB threshold**
 
 **Key Concepts:**
-- **Controller:** `claude-code` orchestrates everything
-- **Executor:** `ollama-code` (or others) performs analysis
+- **Controller:** `Claude Code` orchestrates everything
+- **Executor:** `ollama-code`, `claude -p`, `claude --agent` (or others) perform analysis
 - **Ledger:** `.cal_memory.json` stores persistent context
 - **Arbitration:** Automatic decision on sequential/concurrent/staggered/queued execution
 
